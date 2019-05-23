@@ -62,7 +62,8 @@ async def open_connection(socks_url=None, host=None, port=None, *,
         proxy_type=proxy_type, host=socks_host, port=socks_port,
         username=username, password=password, rdns=rdns, family=family)
     if not sock:
-        raise ProxyError('Only socks proxies are allowed to use `open_connection`')
+        raise ProxyError(
+            'Only socks proxies are allowed to use `open_connection`')
     await sock.connect((host, port))
 
     return await asyncio.open_connection(
@@ -96,7 +97,8 @@ async def create_connection(socks_url=None, protocol_factory=None,
         proxy_type=proxy_type, host=socks_host, port=socks_port,
         username=username, password=password, rdns=rdns, family=family)
     if not sock:
-        raise ProxyError('Only socks proxies are allowed to use `create_connection`')
+        raise ProxyError(
+            'Only socks proxies are allowed to use `create_connection`')
     await sock.connect((host, port))
 
     return await loop.create_connection(

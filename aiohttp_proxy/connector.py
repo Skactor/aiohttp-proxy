@@ -43,10 +43,12 @@ class ProxyConnector(TCPConnector):
     def proxy_url(self):
         if self._proxy_username:
             url = '{scheme}://{host}:{port}'.format(
-                scheme=self._proxy_type, host=self._proxy_host, port=self._proxy_port)
+                scheme=self._proxy_type, host=self._proxy_host,
+                port=self._proxy_port)
         else:
             url = '{scheme}://{host}:{port}'.format(
-                scheme=self._proxy_type, host=self._proxy_host, port=self._proxy_port)
+                scheme=self._proxy_type, host=self._proxy_host,
+                port=self._proxy_port)
         return URL(url)
 
     # noinspection PyMethodOverriding
@@ -62,14 +64,16 @@ class ProxyConnector(TCPConnector):
             await sock.connect((host, port))
 
             return await super()._wrap_create_connection(
-                protocol_factory, None, None, *args, sock=sock.socket, **kwargs)
+                protocol_factory, None, None, *args, sock=sock.socket,
+                **kwargs)
         else:
             return await super(ProxyConnector, self)._wrap_create_connection(
                 protocol_factory, host, port, *args, **kwargs)
 
     async def connect(self, req, traces, timeout):
         if self._proxy_type.is_http():
-            req.update_proxy(self.proxy_url.with_scheme('http'), None, req.proxy_headers)
+            req.update_proxy(self.proxy_url.with_scheme('http'), None,
+                             req.proxy_headers)
         return await super(ProxyConnector, self).connect(
             req=req, traces=traces, timeout=timeout)
 
