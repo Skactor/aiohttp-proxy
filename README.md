@@ -1,10 +1,10 @@
 ## aiohttp-socks
 
-[![Build Status](https://travis-ci.org/romis2012/aiohttp-socks.svg?branch=master)](https://travis-ci.org/romis2012/aiohttp-socks)
-[![Coverage Status](https://coveralls.io/repos/github/romis2012/aiohttp-socks/badge.svg?branch=master)](https://coveralls.io/github/romis2012/aiohttp-socks?branch=master)
-[![PyPI version](https://badge.fury.io/py/aiohttp-socks.svg)](https://badge.fury.io/py/aiohttp-socks)
+[![Build Status](https://travis-ci.org/Skactor/aiohttp-socks.svg?branch=master)](https://github.com/Skactor/aiohttp-proxy)
+[![Coverage Status](https://coveralls.io/repos/github/Skactor/aiohttp-proxy/badge.svg?branch=master)](https://coveralls.io/Skactor/aiohttp-proxy?branch=master)
+[![PyPI version](https://badge.fury.io/py/aiohttp-proxy.svg)](https://badge.fury.io/py/aiohttp-proxy)
 
-SOCKS proxy connector for [aiohttp](https://github.com/aio-libs/aiohttp). SOCKS4(a) and SOCKS5 are supported.
+SOCKS proxy connector for [aiohttp](https://github.com/aio-libs/aiohttp). HTTP, HTTPS, SOCKS4(a) and SOCKS5(h) proxies are supported.
 
 ## Requirements
 - Python >= 3.5.3
@@ -12,7 +12,7 @@ SOCKS proxy connector for [aiohttp](https://github.com/aio-libs/aiohttp). SOCKS4
 
 ## Installation
 ```
-pip install aiohttp_socks
+pip install aiohttp_proxy
 ```
 
 ## Usage
@@ -20,14 +20,14 @@ pip install aiohttp_socks
 #### aiohttp usage:
 ```python
 import aiohttp
-from aiohttp_socks import SocksConnector, SocksVer
+from aiohttp_proxy import ProxyConnector, ProxyType
 
 
 async def fetch(url):
-    connector = SocksConnector.from_url('socks5://user:password@127.0.0.1:1080')
-    ### or use SocksConnector constructor
-    # connector = SocksConnector(
-    #     socks_ver=SocksVer.SOCKS5,
+    connector = ProxyConnector.from_url('http://user:password@127.0.0.1:1080')
+    ### or use ProxyConnector constructor
+    # connector = ProxyConnector(
+    #     socks_ver=ProxyType.SOCKS5,
     #     host='127.0.0.1',
     #     port=1080,
     #     username='user',
@@ -42,11 +42,11 @@ async def fetch(url):
 #### aiohttp-socks also provides `open_connection` and `create_connection` functions:
 
 ```python
-from aiohttp_socks import open_connection
+from aiohttp_proxy import open_connection
 
 async def fetch():
     reader, writer = await open_connection(
-        socks_url='socks5://user:password@127.0.0.1:1080',
+        socks_url='http://user:password@127.0.0.1:1080',
         host='check-host.net',
         port=80
     )
@@ -58,9 +58,11 @@ async def fetch():
     return await reader.read(-1)
 ```
 
-## Why yet another SOCKS connector for aiohttp
+## Why give aiohttp a new proxy support
 
-Unlike [aiosocksy](https://github.com/romis2012/aiosocksy), aiohttp_socks has only single point of integration with aiohttp. 
-This makes it easier to maintain compatibility with new aiohttp versions.
+First must declare, our code is based on [aiohttp-socks](https://github.com/romis2012/aiohttp-socks)，thank you very much for the hard work.
 
+But in order to more flexible support for multiple proxy methods (not just SOCKS proxy),
+we decided to fork [aiohttp-socks] (https://github.com/romis2012/aiohttp-socks), which is currently based on it.
 
+Combine with native aiohttp to provide HTTP/HTTPS proxy instead of writing troublesome discriminating code based on the type of proxy.

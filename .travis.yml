@@ -17,8 +17,8 @@ install:
   - pip install -e .
 
 script:
-  - flake8 aiohttp_socks tests
-  - pytest --cov=./aiohttp_socks tests/ -s
+  - flake8 aiohttp_proxy tests
+  - pytest --cov=./aiohttp_proxy tests/ -s
 
 after_success:
   - coveralls

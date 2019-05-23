@@ -6,8 +6,8 @@ import aiohttp
 # noinspection PyPackageRequirements
 import pytest
 
-from aiohttp_socks import (
-    SocksConnector, SocksVer, SocksError, open_connection,
+from aiohttp_proxy import (
+    ProxyConnector, ProxyType, SocksError, open_connection,
     SocksConnectionError, create_connection)
 from tests.conftest import (
     SOCKS5_IPV4_HOST, SOCKS5_IPV4_PORT,
@@ -51,7 +51,7 @@ SOCKS4_URL = 'socks4://{SOCKS4_HOST}:{SOCKS4_PORT}'.format(
 @pytest.mark.parametrize('rdns', (True, False))
 @pytest.mark.asyncio
 async def test_socks5_connector_ipv4(url, rdns):
-    connector = SocksConnector.from_url(SOCKS5_IPV4_URL, rdns=rdns)
+    connector = ProxyConnector.from_url(SOCKS5_IPV4_URL, rdns=rdns)
     async with aiohttp.ClientSession(connector=connector) as session:
         async with session.get(url) as resp:
             assert resp.status == 200
@@ -59,8 +59,8 @@ async def test_socks5_connector_ipv4(url, rdns):
 
 @pytest.mark.asyncio
 async def test_socks5_connector_with_invalid_credentials():
-    connector = SocksConnector(
-        socks_ver=SocksVer.SOCKS5,
+    connector = ProxyConnector(
+        socks_ver=ProxyType.SOCKS5,
         host=SOCKS5_IPV4_HOST,
         port=SOCKS5_IPV4_PORT,
         username=LOGIN,
@@ -74,8 +74,8 @@ async def test_socks5_connector_with_invalid_credentials():
 
 @pytest.mark.asyncio
 async def test_socks5_connector_with_timeout():
-    connector = SocksConnector(
-        socks_ver=SocksVer.SOCKS5,
+    connector = ProxyConnector(
+        socks_ver=ProxyType.SOCKS5,
         host=SOCKS5_IPV4_HOST,
         port=SOCKS5_IPV4_PORT,
         username=LOGIN,
@@ -89,8 +89,8 @@ async def test_socks5_connector_with_timeout():
 
 @pytest.mark.asyncio
 async def test_socks5_connector_with_invalid_proxy_port(unused_tcp_port):
-    connector = SocksConnector(
-        socks_ver=SocksVer.SOCKS5,
+    connector = ProxyConnector(
+        socks_ver=ProxyType.SOCKS5,
         host=SOCKS5_IPV4_HOST,
         port=unused_tcp_port,
         username=LOGIN,
@@ -105,7 +105,7 @@ async def test_socks5_connector_with_invalid_proxy_port(unused_tcp_port):
 @pytest.mark.skipif(SKIP_IPV6_TESTS, reason='TravisCI doesn`t support ipv6')
 @pytest.mark.asyncio
 async def test_socks5_connector_ipv6():
-    connector = SocksConnector.from_url(SOCKS5_IPV6_URL,
+    connector = ProxyConnector.from_url(SOCKS5_IPV6_URL,
                                         family=socket.AF_INET6)
     async with aiohttp.ClientSession(connector=connector) as session:
         async with session.get(HTTP_TEST_URL) as resp:
@@ -116,7 +116,7 @@ async def test_socks5_connector_ipv6():
 @pytest.mark.parametrize('rdns', (True, False))
 @pytest.mark.asyncio
 async def test_socks4_connector(url, rdns):
-    connector = SocksConnector.from_url(SOCKS4_URL, rdns=rdns,)
+    connector = ProxyConnector.from_url(SOCKS4_URL, rdns=rdns, )
     async with aiohttp.ClientSession(connector=connector) as session:
         async with session.get(url) as resp:
             assert resp.status == 200
