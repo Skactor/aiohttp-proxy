@@ -1,6 +1,6 @@
-## aiohttp-socks
+## aiohttp-proxy
 
-[![Build Status](https://travis-ci.org/Skactor/aiohttp-socks.svg?branch=master)](https://github.com/Skactor/aiohttp-proxy)
+[![Build Status](https://travis-ci.org/Skactor/aiohttp-proxy.svg?branch=master)](https://github.com/Skactor/aiohttp-proxy)
 [![Coverage Status](https://coveralls.io/repos/github/Skactor/aiohttp-proxy/badge.svg?branch=master)](https://coveralls.io/Skactor/aiohttp-proxy?branch=master)
 [![PyPI version](https://badge.fury.io/py/aiohttp-proxy.svg)](https://badge.fury.io/py/aiohttp-proxy)
 
@@ -60,7 +60,7 @@ async def fetch():
 
 ## Why give aiohttp a new proxy support
 
-First must declare, our code is based on [aiohttp-socks](https://github.com/romis2012/aiohttp-socks)，thank you very much for the hard work.
+First must declare, our code is based on [aiohttp-socks](https://github.com/romis2012/aiohttp-socks), thank you very much for the hard work.
 
 But in order to more flexible support for multiple proxy methods (not just SOCKS proxy),
 we decided to fork [aiohttp-socks] (https://github.com/romis2012/aiohttp-socks), which is currently based on it.
