@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 import socket
-from typing import List
 
-from aiohttp import TCPConnector, ClientRequest, ClientTimeout
+from aiohttp import TCPConnector
 from aiohttp.abc import AbstractResolver
-from aiohttp.connector import Connection
-from aiohttp.tracing import Trace
 from yarl import URL
 
 from .helpers import create_socket_wrapper, parse_proxy_url
@@ -70,9 +67,7 @@ class ProxyConnector(TCPConnector):
             return await super(ProxyConnector, self)._wrap_create_connection(
                 protocol_factory, host, port, *args, **kwargs)
 
-    async def connect(self, req: 'ClientRequest',
-                      traces: List['Trace'],
-                      timeout: 'ClientTimeout') -> Connection:
+    async def connect(self, req, traces, timeout):
         if self._proxy_type.is_http():
             req.update_proxy(self.proxy_url.with_scheme('http'), None, req.proxy_headers)
         return await super(ProxyConnector, self).connect(

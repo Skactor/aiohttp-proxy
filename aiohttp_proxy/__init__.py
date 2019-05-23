@@ -8,7 +8,7 @@ from .errors import (
 from .helpers import open_connection, create_connection
 from .proto import ProxyType
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 __all__ = ('ProxyConnector', 'ProxyType',
            'SocksError', 'NoAcceptableAuthMethods', 'UnknownAuthMethod',

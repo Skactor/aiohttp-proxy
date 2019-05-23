@@ -27,7 +27,7 @@ async def fetch(url):
     connector = ProxyConnector.from_url('http://user:password@127.0.0.1:1080')
     ### or use ProxyConnector constructor
     # connector = ProxyConnector(
-    #     socks_ver=ProxyType.SOCKS5,
+    #     proxy_type=ProxyType.SOCKS5,
     #     host='127.0.0.1',
     #     port=1080,
     #     username='user',

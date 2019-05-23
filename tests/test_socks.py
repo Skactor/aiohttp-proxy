@@ -60,7 +60,7 @@ async def test_socks5_connector_ipv4(url, rdns):
 @pytest.mark.asyncio
 async def test_socks5_connector_with_invalid_credentials():
     connector = ProxyConnector(
-        socks_ver=ProxyType.SOCKS5,
+        proxy_type=ProxyType.SOCKS5,
         host=SOCKS5_IPV4_HOST,
         port=SOCKS5_IPV4_PORT,
         username=LOGIN,
@@ -75,7 +75,7 @@ async def test_socks5_connector_with_invalid_credentials():
 @pytest.mark.asyncio
 async def test_socks5_connector_with_timeout():
     connector = ProxyConnector(
-        socks_ver=ProxyType.SOCKS5,
+        proxy_type=ProxyType.SOCKS5,
         host=SOCKS5_IPV4_HOST,
         port=SOCKS5_IPV4_PORT,
         username=LOGIN,
@@ -90,7 +90,7 @@ async def test_socks5_connector_with_timeout():
 @pytest.mark.asyncio
 async def test_socks5_connector_with_invalid_proxy_port(unused_tcp_port):
     connector = ProxyConnector(
-        socks_ver=ProxyType.SOCKS5,
+        proxy_type=ProxyType.SOCKS5,
         host=SOCKS5_IPV4_HOST,
         port=unused_tcp_port,
         username=LOGIN,
