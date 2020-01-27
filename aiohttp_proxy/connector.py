@@ -42,17 +42,14 @@ class ProxyConnector(TCPConnector):
     @property
     def proxy_url(self):
         if self._proxy_username:
-            url_tpl = "{scheme}://{username}:{password}@{host}:{port}"
+            url_tpl = '{scheme}://{username}:{password}@{host}:{port}'
         else:
             url_tpl = '{scheme}://{host}:{port}'
         
         url = url_tpl.format(
-            username=self._proxy_username,
-            password=self._proxy_password,
             scheme=self._proxy_type, 
-            host=self._proxy_host,
-            port=self._proxy_port
-        )
+            username=self._proxy_username, password=self._proxy_password,
+            host=self._proxy_host, port=self._proxy_port)
         return URL(url)
 
     # noinspection PyMethodOverriding
