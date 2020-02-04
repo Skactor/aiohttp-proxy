@@ -12,7 +12,7 @@ from .errors import (
 from .helpers import open_connection, create_connection
 from .proto import ProxyType
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 __all__ = (
     "ProxyConnector",
