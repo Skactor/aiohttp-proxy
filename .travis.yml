@@ -17,7 +17,7 @@ install:
   - pip install -e .
 
 script:
-  - flake8 aiohttp_proxy tests
+  - flake8
   - pytest --cov=./aiohttp_proxy tests/ -s
 
 after_success:

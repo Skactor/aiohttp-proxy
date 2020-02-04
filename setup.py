@@ -19,7 +19,7 @@ with codecs.open(
     "latin1",
 ) as fp:
     try:
-        version = re.findall(r"^__version__ = '([^']+)'\r?$", fp.read(), re.M)[0]
+        version = re.findall(r'^__version__ = "(\S+?)"$', fp.read(), re.M)[0]
     except IndexError:
         raise RuntimeError("Unable to determine version.")
 
