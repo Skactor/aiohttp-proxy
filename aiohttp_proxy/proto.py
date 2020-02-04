@@ -1,13 +1,16 @@
-# -*- coding: utf-8 -*-
 import asyncio
 import socket
 import struct
 from enum import Enum
 
 from .errors import (
-    SocksConnectionError, InvalidServerReply, SocksError,
-    InvalidServerVersion, NoAcceptableAuthMethods,
-    LoginAuthenticationFailed, UnknownAuthMethod
+    SocksConnectionError,
+    InvalidServerReply,
+    SocksError,
+    InvalidServerVersion,
+    NoAcceptableAuthMethods,
+    LoginAuthenticationFailed,
+    UnknownAuthMethod,
 )
 
 RSV = NULL = 0x00
@@ -30,22 +33,22 @@ SOCKS5_ATYP_DOMAIN = 0x03
 SOCKS5_ATYP_IPv6 = 0x04
 
 SOCKS4_ERRORS = {
-    0x5B: 'Request rejected or failed',
-    0x5C: 'Request rejected because SOCKS server '
-          'cannot connect to identd on the client',
-    0x5D: 'Request rejected because the client program '
-          'and identd report different user-ids'
+    0x5B: "Request rejected or failed",
+    0x5C: "Request rejected because SOCKS server "
+    "cannot connect to identd on the client",
+    0x5D: "Request rejected because the client program "
+    "and identd report different user-ids",
 }
 
 SOCKS5_ERRORS = {
-    0x01: 'General SOCKS server failure',
-    0x02: 'Connection not allowed by ruleset',
-    0x03: 'Network unreachable',
-    0x04: 'Host unreachable',
-    0x05: 'Connection refused',
-    0x06: 'TTL expired',
-    0x07: 'Command not supported, or protocol error',
-    0x08: 'Address type not supported'
+    0x01: "General SOCKS server failure",
+    0x02: "Connection not allowed by ruleset",
+    0x03: "Network unreachable",
+    0x04: "Host unreachable",
+    0x05: "Connection refused",
+    0x06: "TTL expired",
+    0x07: "Command not supported, or protocol error",
+    0x08: "Address type not supported",
 }
 
 
@@ -67,21 +70,20 @@ def _is_uvloop(loop):  # pragma: no cover
 
 
 class ProxyType(Enum):
-    SOCKS4 = 'socks4'
-    SOCKS5 = 'socks5'
-    HTTP = 'http'
-    HTTPS = 'https'
+    SOCKS4 = "socks4"
+    SOCKS5 = "socks5"
+    HTTP = "http"
+    HTTPS = "https"
 
     def is_http(self):
-        return self.value in ['http', 'https']
+        return self.value in ["http", "https"]
 
     def __str__(self):
         return self.name.lower()
 
 
 class BaseSocketWrapper(object):
-    def __init__(self, loop, host, port,
-                 family=socket.AF_INET):
+    def __init__(self, loop, host, port, family=socket.AF_INET):
         self._loop = loop
         self._socks_host = host
         self._socks_port = port
@@ -98,25 +100,29 @@ class BaseSocketWrapper(object):
             elif isinstance(item, (bytearray, bytes)):
                 data += item
             else:
-                raise ValueError('Unsupported item')
+                raise ValueError("Unsupported item")
         await self._loop.sock_sendall(self._socket, data)
 
     async def _receive(self, n):
-        data = b''
+        data = b""
         while len(data) < n:
             packet = await self._loop.sock_recv(self._socket, n - len(data))
             if not packet:
-                raise InvalidServerReply('Not all data available')
+                raise InvalidServerReply("Not all data available")
             data += packet
         return bytearray(data)
 
     async def _resolve_addr(self, host, port):
         addresses = await self._loop.getaddrinfo(
-            host=host, port=port, family=socket.AF_UNSPEC,
-            type=socket.SOCK_STREAM, proto=socket.IPPROTO_TCP,
-            flags=socket.AI_ADDRCONFIG)
+            host=host,
+            port=port,
+            family=socket.AF_UNSPEC,
+            type=socket.SOCK_STREAM,
+            proto=socket.IPPROTO_TCP,
+            flags=socket.AI_ADDRCONFIG,
+        )
         if not addresses:
-            raise OSError('Can`t resolve address %s:%s' % (host, port))
+            raise OSError("Can`t resolve address %s:%s" % (host, port))
         family = addresses[0][0]
         addr = addresses[0][4][0]
         return family, addr
@@ -128,23 +134,20 @@ class BaseSocketWrapper(object):
         self._dest_host = address[0]
         self._dest_port = address[1]
 
-        self._socket = socket.socket(
-            family=self._family,
-            type=socket.SOCK_STREAM
-        )
+        self._socket = socket.socket(family=self._family, type=socket.SOCK_STREAM)
         self._socket.setblocking(False)
 
         try:
             await self._loop.sock_connect(
-                sock=self._socket,
-                address=(self._socks_host, self._socks_port)
+                sock=self._socket, address=(self._socks_host, self._socks_port)
             )
         except OSError as e:
             self.close()
             raise SocksConnectionError(
                 e.errno,
-                'Can not connect to proxy %s:%d [%s]' %
-                (self._socks_host, self._socks_port, e.strerror)) from e
+                "Can not connect to proxy %s:%d [%s]"
+                % (self._socks_host, self._socks_port, e.strerror),
+            ) from e
         except asyncio.CancelledError:  # pragma: no cover
             self.close()
             raise
@@ -174,20 +177,14 @@ class BaseSocketWrapper(object):
 
 
 class Socks4SocketWrapper(BaseSocketWrapper):
-    def __init__(self, loop, host, port,
-                 user_id=None, rdns=False):
-        super().__init__(
-            loop=loop,
-            host=host,
-            port=port,
-            family=socket.AF_INET
-        )
+    def __init__(self, loop, host, port, user_id=None, rdns=False):
+        super().__init__(loop=loop, host=host, port=port, family=socket.AF_INET)
         self._user_id = user_id
         self._rdns = rdns
 
     async def _socks_connect(self):
         host, port = self._dest_host, self._dest_port
-        port_bytes = struct.pack(b'>H', port)
+        port_bytes = struct.pack(b">H", port)
 
         include_hostname = False
         try:
@@ -213,22 +210,19 @@ class Socks4SocketWrapper(BaseSocketWrapper):
         req.append(NULL)
 
         if include_hostname:
-            req += [host.encode('idna'), NULL]
+            req += [host.encode("idna"), NULL]
 
         await self._send(req)
 
         res = await self._receive(8)
 
         if res[0] != NULL:
-            raise InvalidServerReply('SOCKS4 proxy server sent invalid data')
+            raise InvalidServerReply("SOCKS4 proxy server sent invalid data")
         if res[1] != SOCKS4_GRANTED:
-            error = SOCKS4_ERRORS.get(res[1], 'Unknown error')
-            raise SocksError('[Errno {0:#04x}]: {1}'.format(res[1], error))
+            error = SOCKS4_ERRORS.get(res[1], "Unknown error")
+            raise SocksError("[Errno {0:#04x}]: {1}".format(res[1], error))
 
-        binded_addr = (
-            socket.inet_ntoa(res[4:]),
-            struct.unpack('>H', res[2:4])[0]
-        )
+        binded_addr = (socket.inet_ntoa(res[4:]), struct.unpack(">H", res[2:4])[0])
         return (host, port), binded_addr
 
     async def negotiate(self):
@@ -236,14 +230,17 @@ class Socks4SocketWrapper(BaseSocketWrapper):
 
 
 class Socks5SocketWrapper(BaseSocketWrapper):
-    def __init__(self, loop, host, port, username=None,
-                 password=None, rdns=True, family=socket.AF_INET):
-        super().__init__(
-            loop=loop,
-            host=host,
-            port=port,
-            family=family
-        )
+    def __init__(
+        self,
+        loop,
+        host,
+        port,
+        username=None,
+        password=None,
+        rdns=True,
+        family=socket.AF_INET,
+    ):
+        super().__init__(loop=loop, host=host, port=port, family=family)
         self._username = username
         self._password = password
         self._rdns = rdns
@@ -262,36 +259,36 @@ class Socks5SocketWrapper(BaseSocketWrapper):
         ver, auth_method = res[0], res[1]
 
         if ver != SOCKS_VER5:
-            raise InvalidServerVersion(
-                'Unexpected SOCKS version number: %s' % ver
-            )
+            raise InvalidServerVersion("Unexpected SOCKS version number: %s" % ver)
 
         if auth_method == SOCKS5_AUTH_NO_ACCEPTABLE_METHODS:
             raise NoAcceptableAuthMethods(
-                'No acceptable authentication methods were offered'
+                "No acceptable authentication methods were offered"
             )
 
         if auth_method not in auth_methods:
             raise UnknownAuthMethod(
-                'Unexpected SOCKS authentication method: %s' % auth_method
+                "Unexpected SOCKS authentication method: %s" % auth_method
             )
 
         # authenticate
         if auth_method == SOCKS5_AUTH_UNAME_PWD:
-            req = [0x01,
-                   chr(len(self._username)).encode(),
-                   self._username.encode(),
-                   chr(len(self._password)).encode(),
-                   self._password.encode()]
+            req = [
+                0x01,
+                chr(len(self._username)).encode(),
+                self._username.encode(),
+                chr(len(self._password)).encode(),
+                self._password.encode(),
+            ]
 
             await self._send(req)
             res = await self._receive(2)
             ver, status = res[0], res[1]
             if ver != 0x01:
-                raise InvalidServerReply('Invalid authentication response')
+                raise InvalidServerReply("Invalid authentication response")
             if status != SOCKS5_GRANTED:
                 raise LoginAuthenticationFailed(
-                    'Username and password authentication failure'
+                    "Username and password authentication failure"
                 )
 
     async def _socks_connect(self):
@@ -302,13 +299,11 @@ class Socks5SocketWrapper(BaseSocketWrapper):
         res = await self._receive(3)
         ver, err_code, reserved = res[0], res[1], res[2]
         if ver != SOCKS_VER5:
-            raise InvalidServerVersion(
-                'Unexpected SOCKS version number: %s' % ver
-            )
+            raise InvalidServerVersion("Unexpected SOCKS version number: %s" % ver)
         if err_code != 0x00:
-            raise SocksError(SOCKS5_ERRORS.get(err_code, 'Unknown error'))
+            raise SocksError(SOCKS5_ERRORS.get(err_code, "Unknown error"))
         if reserved != 0x00:
-            raise InvalidServerReply('The reserved byte must be 0x00')
+            raise InvalidServerReply("The reserved byte must be 0x00")
 
         binded_addr = await self._read_binded_address()
         return resolved_addr, binded_addr
@@ -317,9 +312,11 @@ class Socks5SocketWrapper(BaseSocketWrapper):
         host = self._dest_host
         port = self._dest_port
 
-        family_to_byte = {socket.AF_INET: SOCKS5_ATYP_IPv4,
-                          socket.AF_INET6: SOCKS5_ATYP_IPv6}
-        port_bytes = struct.pack('>H', port)
+        family_to_byte = {
+            socket.AF_INET: SOCKS5_ATYP_IPv4,
+            socket.AF_INET6: SOCKS5_ATYP_IPv6,
+        }
+        port_bytes = struct.pack(">H", port)
 
         # destination address provided is an IPv4 or IPv6 address
         for family in (socket.AF_INET, socket.AF_INET6):
@@ -333,9 +330,13 @@ class Socks5SocketWrapper(BaseSocketWrapper):
         # not IP address, probably a DNS name
         if self._rdns:
             # resolve remotely
-            host_bytes = host.encode('idna')
-            req = [SOCKS5_ATYP_DOMAIN, chr(len(host_bytes)).encode(),
-                   host_bytes, port_bytes]
+            host_bytes = host.encode("idna")
+            req = [
+                SOCKS5_ATYP_DOMAIN,
+                chr(len(host_bytes)).encode(),
+                host_bytes,
+                port_bytes,
+            ]
         else:
             # resolve locally
             family, addr = await self._resolve_addr(host=host, port=port)
@@ -357,10 +358,10 @@ class Socks5SocketWrapper(BaseSocketWrapper):
             addr = await self._receive(16)
             addr = socket.inet_ntop(socket.AF_INET6, addr)
         else:
-            raise InvalidServerReply('SOCKS5 proxy server sent invalid data')
+            raise InvalidServerReply("SOCKS5 proxy server sent invalid data")
 
         port = await self._receive(2)
-        port = struct.unpack('>H', port)[0]
+        port = struct.unpack(">H", port)[0]
 
         return addr, port
 

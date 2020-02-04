@@ -19,13 +19,13 @@ def is_connectable(host, port):
 
 def resolve_path(path):
     return os.path.normpath(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), path))
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
+    )
 
 
 class ProxyServer(object):
     def __init__(self, binary_path, config_path):
-        self.process = subprocess.Popen([binary_path, config_path],
-                                        shell=False)
+        self.process = subprocess.Popen([binary_path, config_path], shell=False)
 
     def wait_until_connectable(self, host, port, timeout=10):
         count = 0
@@ -33,14 +33,14 @@ class ProxyServer(object):
             if self.process.poll() is not None:
                 # process has exited
                 raise Exception(
-                    'The process appears to have exited '
-                    'before we could connect.')
+                    "The process appears to have exited " "before we could connect."
+                )
             if count >= timeout:
                 self.kill()
                 raise Exception(
-                    'The proxy server has not binded '
-                    'to (%s, %s) in %d seconds'
-                    % (host, port, timeout))
+                    "The proxy server has not binded "
+                    "to (%s, %s) in %d seconds" % (host, port, timeout)
+                )
             count += 1
             time.sleep(1)
         return True
